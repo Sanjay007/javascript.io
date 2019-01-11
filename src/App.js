@@ -40,10 +40,12 @@ import LoginModal from "./Components/LoginModal/LoginModal.js";
 import { fetchProfileInfo } from "./actions/user";
 import LoginButton from "./Components/Home/LoginButton";
 import UserMenu from "./Components/Home/UserMenu";
-
+import PublishModal from "./Components/PublishModal/PublishModal.js";
 var mapDispatchToProps = dispatch => {
   return {
     userInit: () => dispatch({ type: "USER_INIT", loading: true }),
+    triggerEdit: () =>
+      dispatch({ type: "EDIT_MODE_TRIGGERED", isEditMode: true }),
     fetchProfile: () => dispatch(fetchProfileInfo())
   };
 };
@@ -54,7 +56,8 @@ var mapStateToProps = state => {
     userData: state.userFunctions.user,
     isAuthenticated: state.userFunctions.isAuthenticated,
     isEditMode: state.userFunctions.isEditMode,
-    userImage: state.userFunctions.user.imageUrl
+    userImage: state.userFunctions.user.imageUrl,
+    editedData: state.userFunctions.currentDraftPost
   };
 };
 class App extends React.Component {
@@ -66,7 +69,8 @@ class App extends React.Component {
       collapsed: false,
       addUserModal: false,
       organizationModal: false,
-      visible: false
+      visible: false,
+      publishModal: false
     };
   }
   componentDidMount() {
@@ -78,16 +82,30 @@ class App extends React.Component {
     });
   };
 
+  triggerEditMode = () => {
+    console.log("clicked Draft mode");
+    this.props.triggerEdit();
+  };
+
+  handlePublishOk = e => {
+    console.log(e);
+    this.setState({
+      publishModal: false
+    });
+  };
+
+  handlePublishCancel = e => {
+    console.log(e);
+    this.setState({
+      publishModal: false
+    });
+  };
+
   handleOk = e => {
     console.log(e);
     this.setState({
       visible: false
     });
-  };
-
-  editMode = () => {
-    this.props.history.push("/edit");
-    console.log(this.props.history);
   };
 
   handleCancel = e => {
@@ -102,6 +120,9 @@ class App extends React.Component {
     this.setState({ collapsed: !this.state.collapsed });
   };
 
+  publishModal = modal => {
+    this.setState({ publishModal: true });
+  };
   onUserCloseModal = modal => {
     console.log("testing");
     this.setState({ addUserModal: modal });
@@ -109,6 +130,10 @@ class App extends React.Component {
 
   onOrganizationCloseModal = modal => {
     this.setState({ organizationModal: modal });
+  };
+
+  publishNow = () => {
+    this.setState({ publishModal: false });
   };
   render() {
     console.log("test", this.props.userData);
@@ -119,6 +144,14 @@ class App extends React.Component {
     const { Option } = Select;
     return (
       <Layout className="ant-layout-has-sider ">
+        <PublishModal
+          image={this.props.editedData.featuredImage}
+          title={this.props.editedData.title}
+          visible={this.state.publishModal}
+          handleOk={this.handlePubishOk}
+          publishNow={this.publishNow}
+          handleCancel={this.handlePublishCancel}
+        />
         <LoginModal
           handleOk={this.handleOk}
           handleCancel={this.handleCancel}
@@ -142,10 +175,11 @@ class App extends React.Component {
 
               <Col span={6} />
               <Col span={6} style={{ textAlign: "right" }}>
-                {this.props.isEditMode ? (
+                {this.props.isEditMode === true ? (
                   <Button
                     style={{ marginTop: "7px", color: "#FGTR" }}
                     type="dashed"
+                    onClick={this.publishModal}
                   >
                     Ready Publish ?
                   </Button>
@@ -156,6 +190,7 @@ class App extends React.Component {
               <Col span={6}>
                 {this.props.isAuthenticated === true ? (
                   <UserMenu
+                    triggerEditMode={this.triggerEditMode}
                     userImage={this.props.userImage}
                     editMode={this.editMode}
                   />

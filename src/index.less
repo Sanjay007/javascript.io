@@ -1,4 +1,4 @@
-@import '~antd/lib/style/themes/default.less';
+@import "~antd/lib/style/themes/default.less";
 
 @pro-header-hover-bg: rgba(0, 0, 0, 0.025);
 
@@ -25,7 +25,7 @@
 }
 
 .menu {
-float:right;
+  float: right;
   :global(.anticon) {
     margin-right: 8px;
   }
@@ -39,7 +39,7 @@ float:right;
   height: @layout-header-height;
   cursor: pointer;
   transition: all 0.3s, padding 0s;
-  padding: ~'calc((@{layout-header-height} - 20px) / 2)' 24px;
+  padding: ~"calc((@{layout-header-height} - 20px) / 2)" 24px;
   &:hover {
     background: @pro-header-hover-bg;
   }
@@ -74,7 +74,7 @@ float:right;
   }
   .account {
     .avatar {
-      margin: ~'calc((@{layout-header-height} - 24px) / 2)' 0;
+      margin: ~"calc((@{layout-header-height} - 24px) / 2)" 0;
       margin-right: 8px;
       color: @primary-color;
       background: rgba(255, 255, 255, 0.85);

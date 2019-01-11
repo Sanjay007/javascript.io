@@ -3,7 +3,8 @@ var data = {
   isAuthenticated: false,
   isLoading: false,
   isEditMode: false,
-  error: ""
+  error: "",
+  currentDraftPost: ""
 };
 
 export default function userFunctions(state = data, action) {
@@ -19,6 +20,11 @@ export default function userFunctions(state = data, action) {
       return { ...state, isAuthenticated: true, user: action.response };
     case "USER_PROFILE_SUCCESS":
       return { ...state, isAuthenticated: false, error: action.response.error };
+    case "EDIT_MODE_TRIGGERED":
+      console.log(state, "trrrrrr");
+      return { ...state, isEditMode: action.isEditMode };
+    case "EDITOR_DATA_SAVE":
+      return { ...state, currentDraftPost: action.editedData };
 
     default:
       return state;

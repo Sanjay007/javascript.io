@@ -9,7 +9,7 @@ export default function(props) {
         {" "}
         <Link to={"/profile"}> My profile</Link>
       </Menu.Item>
-      <Menu.Item onClick={props.editMode}>Write Post</Menu.Item>
+      <Menu.Item>Write Post</Menu.Item>
       <Menu.Item>
         {" "}
         <Link to={"/test"}>Stories</Link>
@@ -21,7 +21,9 @@ export default function(props) {
     <Menu>
       <Menu.Item>
         {" "}
-        <Link to={"/edit"}>Write Post </Link>
+        <Link to={"/edit"} onClick={props.triggerEditMode}>
+          Write Post{" "}
+        </Link>
       </Menu.Item>
       <Menu.Item>Stories</Menu.Item>
     </Menu>
