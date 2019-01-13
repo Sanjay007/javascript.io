@@ -5,11 +5,32 @@ import {
   InputNumber,
   Divider,
   Input,
+  Badge,
   Form,
   Tag,
-  Icon,
-  Popconfirm
+  Icon as IC,
+  Card,
+  Tooltip,
+  Row,
+  Col,
+  Avatar,
+  Popconfirm,
+  List
 } from "antd";
+import { Link } from "react-router-dom";
+import ListPosts from "../Home/ListPosts.js";
+import {
+  Image as ImageComponent,
+  Item,
+  Card as CS,
+  Divider as DC
+} from "semantic-ui-react";
+import AllPosts from "../Home/AllPosts.js";
+import FeaturedCard from "../Home/FeaturedCard.js";
+import styles from "../Home/index.less";
+const paragraph = (
+  <ImageComponent src="https://react.semantic-ui.com/images/wireframe/short-paragraph.png" />
+);
 
 var mapStateToProps = state => {
   return {};
@@ -22,206 +43,70 @@ var mapDispatchToProps = dispatch => {
   };
 };
 
-const data = [];
-for (let i = 0; i < 100; i++) {
-  data.push({
-    key: i.toString(),
-    name: `Edrward ${i}`,
-    age: 32,
-    address: `London Park no. ${i}`
-  });
-}
-
-const FormItem = Form.Item;
-const EditableContext = React.createContext();
-
-const EditableRow = ({ form, index, ...props }) => (
-  <EditableContext.Provider value={form}>
-    <tr {...props} />
-  </EditableContext.Provider>
-);
-
-const EditableFormRow = Form.create()(EditableRow);
-
-class EditableCell extends React.Component {
-  getInput = () => {
-    if (this.props.inputType === "number") {
-      return <InputNumber />;
-    }
-    return <Input />;
-  };
-
-  render() {
-    //localStorage.setItem("user","");
-
-    const {
-      editing,
-      dataIndex,
-      title,
-      inputType,
-      record,
-      index,
-      ...restProps
-    } = this.props;
-    return (
-      <EditableContext.Consumer>
-        {form => {
-          const { getFieldDecorator } = form;
-          return (
-            <td {...restProps}>
-              {editing ? (
-                <FormItem style={{ margin: 0 }}>
-                  {getFieldDecorator(dataIndex, {
-                    rules: [
-                      {
-                        required: true,
-                        message: `Please Input ${title}!`
-                      }
-                    ],
-                    initialValue: record[dataIndex]
-                  })(this.getInput())}
-                </FormItem>
-              ) : (
-                restProps.children
-              )}
-            </td>
-          );
-        }}
-      </EditableContext.Consumer>
-    );
-  }
-}
-
 class Home extends React.Component {
   constructor(props) {
     super(props);
+    const data = [
+      "Racing car sprays burning fuel into crowd.",
+      "Japanese princess to wed commoner.",
+      "Australian walks 100km after outback crash.",
+      "Man charged over missing wedding girl.",
+      "Los Angeles battles huge wildfires."
+    ];
     this.state = {
       data: data,
       editingKey: ""
     };
   }
-  isEditing = record => {
-    return record.key === this.state.editingKey;
-  };
-  cancel = () => {
-    this.setState({ editingKey: "" });
-  };
-  edit = key => {
-    this.setState({ editingKey: key });
-  };
-
-  save = (form, key) => {
-    form.validateFields((error, row) => {
-      if (error) {
-        return;
-      }
-      const newData = [...this.state.data];
-      const index = newData.findIndex(item => key === item.key);
-      if (index > -1) {
-        const item = newData[index];
-        newData.splice(index, 1, {
-          ...item,
-          ...row
-        });
-        this.setState({ data: newData, editingKey: "" });
-      } else {
-        newData.push(row);
-        this.setState({ data: newData, editingKey: "" });
-      }
-    });
-  };
 
   render() {
-    const columns = [
-      {
-        title: "Candidate",
-        dataIndex: "name",
-        width: "25%",
-        editable: true
-      },
-      {
-        title: "Age",
-        dataIndex: "age",
-        width: "15%",
-        editable: true
-      },
-      {
-        title: "Address",
-        dataIndex: "address",
-        width: "40%",
-        editable: true
-      },
-      {
-        title: "Action",
-        dataIndex: "operation",
-        render: (text, record) => {
-          const editable = this.isEditing(record);
-          return (
-            <div>
-              {editable ? (
-                <span>
-                  <EditableContext.Consumer>
-                    {form => (
-                      <a
-                        href="javascript:;"
-                        onClick={() => this.save(form, record.key)}
-                        style={{ marginRight: 8 }}
-                      >
-                        Save
-                      </a>
-                    )}
-                  </EditableContext.Consumer>
-                  <Popconfirm
-                    title="Sure to cancel?"
-                    onConfirm={() => this.cancel(record.key)}
-                  >
-                    <a>Cancel</a>
-                  </Popconfirm>
-                </span>
-              ) : (
-                <a onClick={() => this.edit(record.key)}>Edit</a>
-              )}
-            </div>
-          );
-        }
-      }
-    ];
-
-    const components = {
-      body: {
-        row: EditableFormRow,
-        cell: EditableCell
-      }
-    };
-
-    const outPut = columns.map(col => {
-      if (!col.editable) {
-        return col;
-      }
-      return {
-        ...col,
-        onCell: record => ({
-          record,
-          inputType: col.dataIndex === "age" ? "number" : "text",
-          dataIndex: col.dataIndex,
-          title: col.title,
-          editing: this.isEditing(record)
-        })
-      };
-    });
-
     return (
       <React.Fragment>
-        <div>
-          <h1>hhhhhhhhhhhhhhhhhhhh</h1>
-          <Table
-            components={components}
-            bordered
-            dataSource={this.state.data}
-            columns={outPut}
-            rowClassName="editable-row"
-          />
-        </div>
+        <Row gutter={16}>
+          <Col span={16} offset={2}>
+            <h3 style={{ textAlign: "center", marginBottom: "10px" }}>
+              Featured Posts{" "}
+            </h3>
+          </Col>
+        </Row>
+
+        <Row gutter={16}>
+          <Col span={6} offset={2}>
+            <FeaturedCard />
+          </Col>
+          <Col span={6}>
+            <ListPosts />
+          </Col>
+          <Col span={6}>
+            <FeaturedCard />
+          </Col>
+        </Row>
+
+        <React.Fragment>
+          <DC />
+          <Row gutter={24}>
+            <Col span={12} offset={2}>
+              <h3 style={{ textAlign: "center", margin: "5px" }}>
+                Suggested Reads{" "}
+              </h3>
+            </Col>
+            <Col span={6}>
+              {" "}
+              <h3 style={{ textAlign: "center", margin: "5px" }}>
+                Editor Picks{" "}
+              </h3>
+            </Col>
+          </Row>
+
+          <Row gutter={24}>
+            <Col span={12} offset={2}>
+              <AllPosts />
+            </Col>
+            <Col span={6}>
+              <ListPosts />
+            </Col>
+          </Row>
+        </React.Fragment>
       </React.Fragment>
     );
   }

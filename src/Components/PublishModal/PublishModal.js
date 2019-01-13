@@ -53,7 +53,7 @@ export default function(props) {
             <div class="ant-card-cover">
               <img width={300} alt="example" src={props.image} />
             </div>
-            <h3 style={{ fontFamily: "monospace" }}>{props.title}</h3>
+            <h3 style={{ fontFamily: "Roboto" }}>{props.title}</h3>
 
             <div class="ant-card-actions" style={{ padding: 5 }}>
               <div className="gutter-example">
@@ -83,7 +83,7 @@ export default function(props) {
                         style={{
                           fontSize: "8px",
                           textAlign: "left",
-                          fontFamily: "monospace"
+                          fontFamily: "Roboto"
                         }}
                       >
                         8-Jan-2018
@@ -92,7 +92,7 @@ export default function(props) {
                         style={{
                           fontSize: "8px",
                           textAlign: "left",
-                          fontFamily: "monospace"
+                          fontFamily: "Roboto"
                         }}
                       >
                         2 min read{""}
@@ -155,7 +155,12 @@ export default function(props) {
           <p />
           <Link to={"/test"} onClick={props.publishNow}>
             {" "}
-            <Button dashed icon="download" size={22}>
+            <Button
+              dashed
+              loading={props.buttonloading}
+              icon="download"
+              size={22}
+            >
               Publish Now !
             </Button>
           </Link>

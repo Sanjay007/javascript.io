@@ -26,6 +26,9 @@ export default function userFunctions(state = data, action) {
     case "EDITOR_DATA_SAVE":
       return { ...state, currentDraftPost: action.editedData };
 
+    case "POST_PUBLISH_SUCCESS":
+      return { ...state, currentDraftPost: "" };
+
     default:
       return state;
   }

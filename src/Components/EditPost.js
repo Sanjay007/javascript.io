@@ -60,7 +60,7 @@ class EditPost extends React.Component {
     data.append("file", file);
     return new Promise((resolve, reject) => {
       const xhr = new XMLHttpRequest();
-      xhr.open("POST", "http://localhost:9000/upload");
+      xhr.open("POST", "https://spring-javascript.herokuapp.com/upload");
       const data = new FormData();
       data.append("file", file);
       xhr.setRequestHeader(

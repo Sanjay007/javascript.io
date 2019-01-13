@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+
 import {
   BrowserRouter as Router,
   Route,
@@ -7,6 +8,8 @@ import {
 } from "react-router-dom";
 
 import EditPost from "./Components/EditPost";
+import axios from "./utils/axiosServer.js";
+
 import {
   Badge,
   Layout,
@@ -32,8 +35,6 @@ import { Link } from "react-router-dom";
 import { connect } from "react-redux";
 import "./App.css";
 import styles from "./Components/index.less";
-import User from "./Components/User/User";
-import Organization from "./Components/Organization/Organization";
 import logo from "./logo.svg";
 import "antd/dist/antd.css"; // or 'antd/dist/antd.less'
 import LoginModal from "./Components/LoginModal/LoginModal.js";
@@ -41,12 +42,14 @@ import { fetchProfileInfo } from "./actions/user";
 import LoginButton from "./Components/Home/LoginButton";
 import UserMenu from "./Components/Home/UserMenu";
 import PublishModal from "./Components/PublishModal/PublishModal.js";
+
 var mapDispatchToProps = dispatch => {
   return {
     userInit: () => dispatch({ type: "USER_INIT", loading: true }),
     triggerEdit: () =>
       dispatch({ type: "EDIT_MODE_TRIGGERED", isEditMode: true }),
-    fetchProfile: () => dispatch(fetchProfileInfo())
+    fetchProfile: () => dispatch(fetchProfileInfo()),
+    postPublishSuccess: () => dispatch({ type: "POST_PUBLISH_SUCCESS" })
   };
 };
 
@@ -63,14 +66,14 @@ var mapStateToProps = state => {
 class App extends React.Component {
   constructor(props) {
     super(props);
-    const { dispatch } = props;
     this.state = {
       isEditMode: false,
       collapsed: false,
       addUserModal: false,
       organizationModal: false,
       visible: false,
-      publishModal: false
+      publishModal: false,
+      buttonloading: false
     };
   }
   componentDidMount() {
@@ -123,28 +126,36 @@ class App extends React.Component {
   publishModal = modal => {
     this.setState({ publishModal: true });
   };
-  onUserCloseModal = modal => {
-    console.log("testing");
-    this.setState({ addUserModal: modal });
-  };
 
-  onOrganizationCloseModal = modal => {
-    this.setState({ organizationModal: modal });
-  };
-
+  /**
+   * As a Callback to PublishModal
+   * Updates Modal to Close
+   * Updates Button loader
+   */
   publishNow = () => {
-    this.setState({ publishModal: false });
-  };
-  render() {
-    console.log("test", this.props.userData);
-    const { Header, Content, Footer, Sider } = Layout;
-    const { SubMenu } = Menu;
-    const { Meta } = Card;
+    this.setState({ buttonloading: true });
+    let reqData = this.props.editedData;
+    reqData.type = "PUBLISHED";
+    reqData.data = this.props.editedData.postsdata;
 
-    const { Option } = Select;
+    axios
+      .post("/posts", reqData)
+      .then(response => {
+        console.log("api", response);
+        this.props.postPublishSuccess();
+        this.setState({ buttonloading: false, publishModal: false });
+      })
+      .catch(err => {
+        message.error("Something Bad Happened !");
+      });
+  };
+
+  render() {
+    const { Content, Footer } = Layout;
     return (
       <Layout className="ant-layout-has-sider ">
         <PublishModal
+          buttonloading={this.state.buttonloading}
           image={this.props.editedData.featuredImage}
           title={this.props.editedData.title}
           visible={this.state.publishModal}
@@ -158,19 +169,13 @@ class App extends React.Component {
           visible={this.state.visible}
         />
 
-        <User
-          showUserModal={this.state.addUserModal}
-          onUserCloseModal={this.onUserCloseModal}
-        />
-        <Organization
-          organizationModal={this.state.organizationModal}
-          onOrganizationCloseModal={this.onOrganizationCloseModal}
-        />
         <Layout>
           <div>
             <Row gutter={24} style={{ background: "#FFF" }}>
               <Col span={6}>
-                <img style={{ width: "60px", height: "45px" }} src={logo} />
+                <Link to={"/"}>
+                  <img style={{ width: "60px", height: "45px" }} src={logo} />
+                </Link>
               </Col>
 
               <Col span={6} />
