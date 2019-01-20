@@ -14,7 +14,9 @@ export default function(props) {
         {" "}
         <Link to={"/test"}>Stories</Link>
       </Menu.Item>
-      <Menu.Item>Sign out</Menu.Item>
+      <Menu.Item>
+        <a onClick={props.logout}>Sign out</a>
+      </Menu.Item>
     </Menu>
   );
   const userMenu = (

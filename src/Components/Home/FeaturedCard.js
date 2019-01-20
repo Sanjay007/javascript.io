@@ -1,10 +1,20 @@
 import React from "react";
 import { connect } from "react-redux";
-import { Badge, Tag, Icon as IC, Tooltip, Row, Col, Avatar } from "antd";
+import {
+  Badge,
+  Tag,
+  Popover,
+  Icon as IC,
+  Tooltip,
+  Row,
+  Col,
+  Avatar
+} from "antd";
 import { Link } from "react-router-dom";
 import { Image as ImageComponent, Card as CS } from "semantic-ui-react";
 import PropTypes from "prop-types";
-
+import Profileinfo from "../ProfileInfoPopover/ProfileInfo.js";
+import styles from "./index.less";
 var mapStateToProps = state => {
   return {};
 };
@@ -24,13 +34,10 @@ class FeaturedCard extends React.Component {
   render() {
     return (
       <CS>
-        <ImageComponent
-          src="https://react.semantic-ui.com/images/avatar/large/matthew.png"
-          style={{ height: "200px" }}
-        />
+        <ImageComponent src={this.props.imageSrc} style={{ height: "200px" }} />
         <CS.Content style={{ background: "#f0f2f5" }}>
           <CS.Header style={{ textAlign: "center" }}>
-            Arrowhead Valley Camp Arrowhead Valley Camp
+            {this.props.title ? this.props.title : "SSSSSSSSSSS"}
           </CS.Header>
           <CS.Meta>
             <span style={{ fontSize: "0.6em", margin: "3px" }} className="stay">
@@ -51,13 +58,17 @@ class FeaturedCard extends React.Component {
           <Row gutter={24} style={{ padding: "3px" }}>
             <Col span={4}>
               {" "}
-              <Tooltip title="Sanjay Yadav">
+              <Popover
+                style={{ background: "#f0f2f5", margin: "0px", padding: "0px" }}
+                content={<Profileinfo />}
+                trigger="hover"
+              >
                 <Avatar
                   style={{ backgroundColor: "#87d068" }}
                   size={36}
                   icon="user"
                 />
-              </Tooltip>
+              </Popover>
             </Col>
             <Col span={6}>
               {" "}

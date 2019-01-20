@@ -1,6 +1,6 @@
 import axios from "axios";
 
-export const API_ROOT = "https://spring-javascript.herokuapp.com";
+export const API_ROOT = "http://localhost:9000";
 
 const axiosInst = axios.create({
   baseURL: API_ROOT

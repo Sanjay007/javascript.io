@@ -28,6 +28,8 @@ export default function userFunctions(state = data, action) {
 
     case "POST_PUBLISH_SUCCESS":
       return { ...state, currentDraftPost: "" };
+    case "USER_LOGOUT":
+      return { ...state, isAuthenticated: false, user: "" };
 
     default:
       return state;

@@ -30,7 +30,8 @@ var mapStateToProps = state => {
     isAuthenticated: state.userFunctions.isAuthenticated,
     isEditMode: state.userFunctions.isEditMode,
     userImage: state.userFunctions.user.imageUrl,
-    editedData: state.userFunctions.currentDraftPost
+    editedData: state.userFunctions.currentDraftPost,
+    textData: ""
   };
 };
 
@@ -48,7 +49,22 @@ class EditPost extends React.Component {
   onEditorStateChange: Function = editorState => {
     this.saveContent(editorState.getCurrentContent());
     ////console.log(editorState, "State Changed");
-    /// console.log(convertToRaw(editorState.getCurrentContent()));
+    console.log(convertToRaw(editorState.getCurrentContent()));
+    let myText = this.state.editorState.getCurrentContent().getPlainText();
+    console.log(myText);
+
+    myText = myText.replace(/(^\s*)|(\s*$)/gi, "");
+    myText = myText.replace(/[ ]{2,}/gi, " ");
+    myText = myText.replace(/\n /, "\n");
+    console.log(myText.split(" ").length);
+    let wpm = 200;
+    let estimatedTime = myText.split(" ").length / wpm;
+    let minutes = Math.round(estimatedTime);
+    let finaTime = minutes < 1 ? "a couple of secs" : minutes + " min read";
+    console.log(finaTime);
+
+    var effectiveTime =
+      minutes < 1 ? "a couple of secs" : minutes + " min read";
 
     this.setState({
       editorState
@@ -60,7 +76,7 @@ class EditPost extends React.Component {
     data.append("file", file);
     return new Promise((resolve, reject) => {
       const xhr = new XMLHttpRequest();
-      xhr.open("POST", "https://spring-javascript.herokuapp.com/upload");
+      xhr.open("POST", "http://localhost:9000/upload");
       const data = new FormData();
       data.append("file", file);
       xhr.setRequestHeader(
@@ -81,34 +97,24 @@ class EditPost extends React.Component {
   };
 
   saveContent = debounce(content => {
-    console.log();
+    let myText = this.state.editorState.getCurrentContent().getPlainText();
+    console.log(myText);
     let sanjay = JSON.stringify(content);
-    let index = sanjay.indexOf('data":{"src"');
-    let x = sanjay.substr(index, sanjay.length);
-    console.log(index);
 
-    console.log(x);
-    let request = {
-      data: JSON.stringify(convertToRaw(content)),
-      title: this.state.title,
-      hashedId: this.state.hashedId
-    };
     message
       .loading("Saving..", 1.5)
       .then(() => message.success("Saving Done", 0.5));
 
-    console.log("Request", request);
     axios
       .post("/posts", {
         data: JSON.stringify(convertToRaw(content)),
         title: this.state.title,
-        hashedId: this.state.hashedId
+        hashedId: this.state.hashedId,
+        textData: myText
       })
       .then(response => {
+        this.props.triggerEdit();
         console.log("api", response);
-
-        console.log(response.data.data.hashedId, "Hashed");
-
         this.setState({
           hashedId: response.data.data.hashedId,
           featuredImage: response.data.data.featuredImage
@@ -136,7 +142,7 @@ class EditPost extends React.Component {
       JSON.stringify(convertToRaw(content))
     );
     window.localStorage.setItem("title", this.state.title);
-  }, 3000);
+  }, 1000);
 
   onChangeUserName = e => {
     this.setState({ title: e.target.value });
@@ -159,9 +165,7 @@ class EditPost extends React.Component {
     //   hashedId: this.props.editedData.hashedId
     // });
   }
-  componentWillMount() {
-    this.props.triggerEdit();
-  }
+  componentWillMount() {}
 
   componentWillUnmount() {
     console.log("Edit Post Unmounted");

@@ -1,36 +1,12 @@
 import React from "react";
 import { connect } from "react-redux";
-import {
-  Table,
-  InputNumber,
-  Divider,
-  Input,
-  Badge,
-  Form,
-  Tag,
-  Icon as IC,
-  Card,
-  Tooltip,
-  Row,
-  Col,
-  Avatar,
-  Popconfirm,
-  List
-} from "antd";
+import { Icon as IC, Row, Col } from "antd";
 import { Link } from "react-router-dom";
 import ListPosts from "../Home/ListPosts.js";
-import {
-  Image as ImageComponent,
-  Item,
-  Card as CS,
-  Divider as DC
-} from "semantic-ui-react";
+import { Image as ImageComponent, Divider as DC } from "semantic-ui-react";
 import AllPosts from "../Home/AllPosts.js";
 import FeaturedCard from "../Home/FeaturedCard.js";
 import styles from "../Home/index.less";
-const paragraph = (
-  <ImageComponent src="https://react.semantic-ui.com/images/wireframe/short-paragraph.png" />
-);
 
 var mapStateToProps = state => {
   return {};
@@ -58,15 +34,16 @@ class Home extends React.Component {
       editingKey: ""
     };
   }
+  componentWillUnmount() {
+    window.onbeforeunload = null;
+  }
 
   render() {
     return (
       <React.Fragment>
         <Row gutter={16}>
           <Col span={16} offset={2}>
-            <h3 style={{ textAlign: "center", marginBottom: "10px" }}>
-              Featured Posts{" "}
-            </h3>
+            <h3 style={{ textAlign: "center", marginBottom: "10px" }}> </h3>
           </Col>
         </Row>
 

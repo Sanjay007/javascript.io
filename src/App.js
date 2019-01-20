@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-
+import { GITHUB_AUTH_URL } from "./Constants";
 import {
   BrowserRouter as Router,
   Route,
@@ -26,6 +26,7 @@ import {
   Button,
   message,
   Row,
+  Alert,
   Col
 } from "antd";
 import { userInit } from "./actions/user";
@@ -39,16 +40,22 @@ import logo from "./logo.svg";
 import "antd/dist/antd.css"; // or 'antd/dist/antd.less'
 import LoginModal from "./Components/LoginModal/LoginModal.js";
 import { fetchProfileInfo } from "./actions/user";
+import { getDashboard } from "./actions/posts";
+
 import LoginButton from "./Components/Home/LoginButton";
 import UserMenu from "./Components/Home/UserMenu";
 import PublishModal from "./Components/PublishModal/PublishModal.js";
 
 var mapDispatchToProps = dispatch => {
   return {
+    triggerNoEdit: () =>
+      dispatch({ type: "EDIT_MODE_TRIGGERED", isEditMode: false }),
     userInit: () => dispatch({ type: "USER_INIT", loading: true }),
     triggerEdit: () =>
       dispatch({ type: "EDIT_MODE_TRIGGERED", isEditMode: true }),
+    doLogout: () => dispatch({ type: "USER_LOGOUT" }),
     fetchProfile: () => dispatch(fetchProfileInfo()),
+    getDashboardData: () => dispatch(getDashboard()),
     postPublishSuccess: () => dispatch({ type: "POST_PUBLISH_SUCCESS" })
   };
 };
@@ -92,6 +99,7 @@ class App extends React.Component {
 
   handlePublishOk = e => {
     console.log(e);
+
     this.setState({
       publishModal: false
     });
@@ -118,6 +126,11 @@ class App extends React.Component {
     });
   };
 
+  handleLogout = e => {
+    localStorage.removeItem("ACCESS_TOKEN");
+    this.props.doLogout();
+    this.props.history.push("/");
+  };
   onCollapse = collapsed => {
     console.log(collapsed);
     this.setState({ collapsed: !this.state.collapsed });
@@ -137,12 +150,14 @@ class App extends React.Component {
     let reqData = this.props.editedData;
     reqData.type = "PUBLISHED";
     reqData.data = this.props.editedData.postsdata;
-
+    reqData.tags = "";
     axios
       .post("/posts", reqData)
       .then(response => {
         console.log("api", response);
         this.props.postPublishSuccess();
+        this.props.triggerNoEdit();
+        this.props.history.push("/test");
         this.setState({ buttonloading: false, publishModal: false });
       })
       .catch(err => {
@@ -150,6 +165,12 @@ class App extends React.Component {
       });
   };
 
+  navigateGit = () => {
+    window.location.href = GITHUB_AUTH_URL;
+  };
+  componentWillMount() {
+    this.props.getDashboardData();
+  }
   render() {
     const { Content, Footer } = Layout;
     return (
@@ -164,6 +185,7 @@ class App extends React.Component {
           handleCancel={this.handlePublishCancel}
         />
         <LoginModal
+          navigateGit={this.navigateGit}
           handleOk={this.handleOk}
           handleCancel={this.handleCancel}
           visible={this.state.visible}
@@ -195,6 +217,7 @@ class App extends React.Component {
               <Col span={6}>
                 {this.props.isAuthenticated === true ? (
                   <UserMenu
+                    logout={this.handleLogout}
                     triggerEditMode={this.triggerEditMode}
                     userImage={this.props.userImage}
                     editMode={this.editMode}
@@ -214,7 +237,9 @@ class App extends React.Component {
   }
 }
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(App);
+export default withRouter(
+  connect(
+    mapStateToProps,
+    mapDispatchToProps
+  )(App)
+);

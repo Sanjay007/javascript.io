@@ -13,6 +13,9 @@ body {
 
 .ant-carousel .slick-slide h3 {
   color: #fff;
-  align-self: center
+  align-self: center;
 }
 
+.ant-popover-inner-content {
+  padding: 0px !important;
+}
