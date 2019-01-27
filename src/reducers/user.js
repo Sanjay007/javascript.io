@@ -4,11 +4,15 @@ var data = {
   isLoading: false,
   isEditMode: false,
   error: "",
-  currentDraftPost: ""
+  currentDraftPost: "",
+  latestPost: ""
 };
 
 export default function userFunctions(state = data, action) {
   switch (action.type) {
+    case "UPDATE_LATEST_DRAFT_POST":
+      return { ...state, latestPost: action.data };
+
     case "USER_INIT":
       return { ...state, isLoading: true };
     case "USER_SUCCESS":
@@ -30,6 +34,12 @@ export default function userFunctions(state = data, action) {
       return { ...state, currentDraftPost: "" };
     case "USER_LOGOUT":
       return { ...state, isAuthenticated: false, user: "" };
+
+    case "TAGS_POST":
+      return {
+        ...state,
+        currentDraftPost: { ...state.currentDraftPost, tags: action.value }
+      };
 
     default:
       return state;

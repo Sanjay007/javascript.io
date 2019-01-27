@@ -7,17 +7,20 @@ import styles from "../Components/index.less";
 import { EditorState, convertFromRaw, convertToRaw } from "draft-js";
 import axios from "../utils/axiosServer";
 import Title from "../Components/EditPost/Title";
+import Dante from "Dante2";
 import "../../node_modules/react-draft-wysiwyg/dist/react-draft-wysiwyg.css";
-import { saveIntermediatePost } from "../actions/user.js";
 
+window.onbeforeunload = function() {
+  return "Data will be lost if you leave the page, are you sure?";
+};
 var mapDispatchToProps = dispatch => {
   return {
+    triggerEdit: () =>
+      dispatch({ type: "EDIT_MODE_TRIGGERED", isEditMode: true }),
     triggerNoEdit: () =>
       dispatch({ type: "EDIT_MODE_TRIGGERED", isEditMode: false }),
-    updateLatestDraft: data =>
-      dispatch({ type: "UPDATE_LATEST_DRAFT_POST", data: data }),
-
-    saveInterm: data => dispatch(saveIntermediatePost(data))
+    storeEditedData: data =>
+      dispatch({ type: "EDITOR_DATA_SAVE", editedData: data })
   };
 };
 
@@ -33,7 +36,7 @@ var mapStateToProps = state => {
   };
 };
 
-class EditPost extends React.Component {
+class EditPostDante extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -45,15 +48,24 @@ class EditPost extends React.Component {
   }
 
   onEditorStateChange: Function = editorState => {
-    this.props.updateLatestDraft(
-      JSON.stringify(convertToRaw(editorState.getCurrentContent()))
-    );
-
     this.saveContent(editorState.getCurrentContent());
     ////console.log(editorState, "State Changed");
     console.log(convertToRaw(editorState.getCurrentContent()));
     let myText = this.state.editorState.getCurrentContent().getPlainText();
     console.log(myText);
+
+    myText = myText.replace(/(^\s*)|(\s*$)/gi, "");
+    myText = myText.replace(/[ ]{2,}/gi, " ");
+    myText = myText.replace(/\n /, "\n");
+    console.log(myText.split(" ").length);
+    let wpm = 200;
+    let estimatedTime = myText.split(" ").length / wpm;
+    let minutes = Math.round(estimatedTime);
+    let finaTime = minutes < 1 ? "a couple of secs" : minutes + " min read";
+    console.log(finaTime);
+
+    var effectiveTime =
+      minutes < 1 ? "a couple of secs" : minutes + " min read";
 
     this.setState({
       editorState
@@ -94,47 +106,38 @@ class EditPost extends React.Component {
       .loading("Saving..", 1.5)
       .then(() => message.success("Saving Done", 0.5));
 
-    var dataReq = {
-      data: JSON.stringify(convertToRaw(content)),
-      title: this.state.title,
-      hashedId: this.state.hashedId,
-      textData: myText
-    };
+    axios
+      .post("/posts", {
+        data: JSON.stringify(convertToRaw(content)),
+        title: this.state.title,
+        hashedId: this.state.hashedId,
+        textData: myText
+      })
+      .then(response => {
+        this.props.triggerEdit();
+        console.log("api", response);
+        this.setState({
+          hashedId: response.data.data.hashedId,
+          featuredImage: response.data.data.featuredImage
+        });
 
-    this.props.saveInterm(dataReq);
+        console.log("Edit posts Own State", this.state);
+        let dataStored = {
+          title: this.state.title,
+          postsdata: JSON.stringify(convertToRaw(content)),
+          tags: [],
+          featuredImage: response.data.data.featuredImage,
+          minRead: "2 min read",
+          hashedId: response.data.data.hashedId
+        };
 
-    // axios
-    //   .post("/posts", {
-    //     data: JSON.stringify(convertToRaw(content)),
-    //     title: this.state.title,
-    //     hashedId: this.state.hashedId,
-    //     textData: myText
-    //   })
-    //   .then(response => {
-    //     this.props.triggerEdit();
-    //     console.log("api", response);
-    //     this.setState({
-    //       hashedId: response.data.data.hashedId,
-    //       featuredImage: response.data.data.featuredImage
-    //     });
+        this.props.storeEditedData(dataStored);
+      })
+      .catch(err => {
+        message.error("Error Occured!");
 
-    //     console.log("Edit posts Own State", this.state);
-    //     let dataStored = {
-    //       title: this.state.title,
-    //       postsdata: JSON.stringify(convertToRaw(content)),
-    //       tags: [],
-    //       featuredImage: response.data.data.featuredImage,
-    //       minRead: "2 min read",
-    //       hashedId: response.data.data.hashedId
-    //     };
-
-    //     this.props.storeEditedData(dataStored);
-    //   })
-    //   .catch(err => {
-    //     message.error("Error Occured!");
-
-    //     console.log("SDDDDDDDDDD");
-    //   });
+        console.log("SDDDDDDDDDD");
+      });
     window.localStorage.setItem(
       "content",
       JSON.stringify(convertToRaw(content))
@@ -181,7 +184,8 @@ class EditPost extends React.Component {
             onChangeUserName={this.onChangeUserName}
           />
           <Card style={{ minHeight: "280px", background: "#f0f2f5" }}>
-            <Editor
+            <Dante content={null} />
+            {/*<Editor
               editorState={editorState}
               placeholder="Start Writing Your Ideas"
               toolbar={{
@@ -192,7 +196,7 @@ class EditPost extends React.Component {
               }}
               wrapperClassName="demo-wrapper"
               onEditorStateChange={this.onEditorStateChange}
-            />
+            />*/}
           </Card>
         </Col>
 
@@ -205,4 +209,4 @@ class EditPost extends React.Component {
 export default connect(
   mapStateToProps,
   mapDispatchToProps
-)(EditPost);
+)(EditPostDante);

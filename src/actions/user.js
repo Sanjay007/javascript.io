@@ -1,5 +1,6 @@
 import axios from "../utils/axiosServer";
 import { history } from "../_helpers/history";
+import { EditorState, convertFromRaw, convertToRaw } from "draft-js";
 
 export const userInit = () => dispatch => {
   const data = { isLoading: true };
@@ -79,6 +80,46 @@ export const fetchProfileInfo = () => dispatch => {
       console.log("api err", err);
       dispatch({ type: "USER_PROFILE_FAILURE", response: err });
     });
+};
+
+export const saveIntermediatePost = reqData => {
+  return dispatch => {
+    const url = "/posts";
+    axios
+      .post(url, reqData)
+      .then(response => {
+        console.log("api", response);
+        dispatch({
+          type: "SAVE_INTERMEDIATE_POST",
+          response: response.data
+        });
+        dispatch({ type: "EDIT_MODE_TRIGGERED", isEditMode: true });
+
+        const convertedState = convertFromRaw(
+          JSON.parse(response.data.data.data)
+        );
+        // const editorValue = EditorState.createWithContent(
+        //   convertedState.getCurrentContent()
+        // );
+
+        let dataStored = {
+          title: response.data.data.title,
+          tags: [],
+          postsData: JSON.stringify(convertedState),
+          featuredImage: response.data.data.featuredImage,
+          minRead: "2 min read",
+          hashedId: response.data.data.hashedId,
+          textData: response.data.data.textData,
+          postDate: response.data.data.postDate
+        };
+
+        dispatch({ type: "EDITOR_DATA_SAVE", editedData: dataStored });
+      })
+      .catch(err => {
+        console.log("api err", err);
+        dispatch({ type: "SAVE_INTERMEDIATE_POST_FAILURE", response: err });
+      });
+  };
 };
 
 // export const login = (username, password) => (dispatch)=>{

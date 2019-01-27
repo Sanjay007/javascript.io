@@ -27,7 +27,8 @@ import {
   message,
   Row,
   Alert,
-  Col
+  Col,
+  Spin
 } from "antd";
 import { userInit } from "./actions/user";
 import { bindActionCreators } from "redux";
@@ -67,7 +68,8 @@ var mapStateToProps = state => {
     isAuthenticated: state.userFunctions.isAuthenticated,
     isEditMode: state.userFunctions.isEditMode,
     userImage: state.userFunctions.user.imageUrl,
-    editedData: state.userFunctions.currentDraftPost
+    editedData: state.userFunctions.currentDraftPost,
+    latestPostDraft: state.userFunctions.latestPost
   };
 };
 class App extends React.Component {
@@ -80,7 +82,8 @@ class App extends React.Component {
       organizationModal: false,
       visible: false,
       publishModal: false,
-      buttonloading: false
+      buttonloading: false,
+      spinnerStart: false
     };
   }
   componentDidMount() {
@@ -98,6 +101,19 @@ class App extends React.Component {
   };
 
   handlePublishOk = e => {
+    axios
+      .post("/posts", {
+        data: this.props.latestPostDraft,
+        title: this.state.editedData,
+        hashedId: this.state.hashedId
+      })
+      .then(response => {
+        console.log("SDDDDDDDDDD");
+      })
+      .catch(err => {
+        console.log("SDDDDDDDDDD");
+      });
+
     console.log(e);
 
     this.setState({
@@ -137,7 +153,24 @@ class App extends React.Component {
   };
 
   publishModal = modal => {
-    this.setState({ publishModal: true });
+    this.setState({ spinnerStart: true });
+
+    axios
+      .post("/posts", {
+        data: this.props.latestPostDraft,
+        title: this.props.editedData.title,
+        hashedId: this.props.editedData.hashedId,
+        textData: this.props.editedData.textData
+      })
+      .then(response => {
+        this.setState({ publishModal: true, spinnerStart: false });
+        console.log("SDDDDDDDDDD");
+      })
+      .catch(err => {
+        this.setState({ spinnerStart: false });
+
+        console.log("SDDDDDDDDDD");
+      });
   };
 
   /**
@@ -147,10 +180,15 @@ class App extends React.Component {
    */
   publishNow = () => {
     this.setState({ buttonloading: true });
-    let reqData = this.props.editedData;
-    reqData.type = "PUBLISHED";
-    reqData.data = this.props.editedData.postsdata;
-    reqData.tags = "";
+    let reqData = {
+      type: "PUBLISHED",
+      data: this.props.latestPostDraft,
+      tags: this.props.editedData.tags,
+      hashedId: this.props.editedData.hashedId,
+      title: this.props.editedData.title,
+      textData: this.props.editedData.textData
+    };
+    console.log("reqDta", reqData);
     axios
       .post("/posts", reqData)
       .then(response => {
@@ -162,6 +200,7 @@ class App extends React.Component {
       })
       .catch(err => {
         message.error("Something Bad Happened !");
+        this.setState({ buttonloading: false });
       });
   };
 
@@ -179,10 +218,13 @@ class App extends React.Component {
           buttonloading={this.state.buttonloading}
           image={this.props.editedData.featuredImage}
           title={this.props.editedData.title}
+          editedData={this.props.editedData}
           visible={this.state.publishModal}
           handleOk={this.handlePubishOk}
           publishNow={this.publishNow}
           handleCancel={this.handlePublishCancel}
+          textData={this.props.editedData.textData}
+          postDate={this.props.editedData.postDate}
         />
         <LoginModal
           navigateGit={this.navigateGit}
@@ -229,7 +271,11 @@ class App extends React.Component {
             </Row>
           </div>
 
-          <Content style={{ margin: "0 16px" }}>{this.props.children}</Content>
+          <Spin spinning={this.state.spinnerStart} size="large">
+            <Content style={{ margin: "0 16px" }}>
+              {this.props.children}
+            </Content>
+          </Spin>
           <Footer style={{ textAlign: "center" }}>@Frugalisminds</Footer>
         </Layout>
       </Layout>

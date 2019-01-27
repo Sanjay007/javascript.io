@@ -54,7 +54,7 @@ class PublishModal extends React.Component {
     axios
       .get("/tags")
       .then(response => {
-        console.log("api", response);
+        console.log("TAG API", response);
         const rdata = response.data.data.map(user => ({
           text: `${user.tagName}`,
           value: user.tagName
@@ -93,6 +93,8 @@ class PublishModal extends React.Component {
             <FeaturedCard
               imageSrc={this.props.image}
               title={this.props.title}
+              shortDescription={this.props.textData}
+              postDate={this.props.postDate}
             />
           </Col>
           <Col span={12} style={{ padding: "5px" }}>

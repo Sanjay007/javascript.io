@@ -15,6 +15,8 @@ import { Image as ImageComponent, Card as CS } from "semantic-ui-react";
 import PropTypes from "prop-types";
 import Profileinfo from "../ProfileInfoPopover/ProfileInfo.js";
 import styles from "./index.less";
+import { getReadTime } from "../../utils/commonUtils.js";
+import _ from "lodash";
 var mapStateToProps = state => {
   return {};
 };
@@ -41,17 +43,26 @@ class FeaturedCard extends React.Component {
           </CS.Header>
           <CS.Meta>
             <span style={{ fontSize: "0.6em", margin: "3px" }} className="stay">
-              <IC type="schedule" /> {"  "}Jan-7-2019
+              <IC type="schedule" />{" "}
+              {this.props.postDate != undefined
+                ? this.props.postDate
+                : "00-JAN-00"}
             </span>
             <span
               style={{ fontSize: "0.6em", margin: "8px" }}
               className="price"
             >
-              <IC type="clock-circle" /> {" 2 min read"}
+              <IC type="clock-circle" />{" "}
+              {this.props.shortDescription != undefined
+                ? getReadTime(this.props.shortDescription)
+                : "Test Content"}
             </span>
           </CS.Meta>
           <CS.Description>
-            Matthew is a musician living in Nashville.
+            {_.truncate(this.props.shortDescription, {
+              length: 50,
+              separator: " "
+            })}{" "}
           </CS.Description>
         </CS.Content>
         <CS.Content extra>
