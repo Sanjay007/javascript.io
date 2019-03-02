@@ -7,15 +7,20 @@ import { Image as ImageComponent, Divider as DC } from "semantic-ui-react";
 import AllPosts from "../Home/AllPosts.js";
 import FeaturedCard from "../Home/FeaturedCard.js";
 import styles from "../Home/index.less";
+import axios from "../../utils/axiosServer.js";
 
 var mapStateToProps = state => {
-  return {};
+  return {
+    store: state,
+    dashboardData: state.posts.dashboard
+  };
 };
 
 var mapDispatchToProps = dispatch => {
   return {
     changeConfigPageMenu: value =>
-      dispatch({ type: "CHANGE_CONFIGURATION_PAGE_MENU", value })
+      dispatch({ type: "CHANGE_CONFIGURATION_PAGE_MENU", value }),
+    updateDSBData: value => dispatch({ type: "DASHBOARD_DATA", value })
   };
 };
 
@@ -34,11 +39,20 @@ class Home extends React.Component {
       editingKey: ""
     };
   }
-  componentWillUnmount() {
-    window.onbeforeunload = null;
+  componentDidMount() {
+    axios
+      .get("/dashboard")
+      .then(response => {
+        // console.log("Dashboardapi", response);
+        this.props.updateDSBData(response.data.data);
+      })
+      .catch(err => {
+        console.log("api err", err);
+      });
   }
 
   render() {
+    console.log(this.props.dashboardData, "sdddddddd");
     return (
       <React.Fragment>
         <Row gutter={16}>
@@ -52,7 +66,7 @@ class Home extends React.Component {
             <FeaturedCard />
           </Col>
           <Col span={6}>
-            <ListPosts />
+            <ListPosts dashboard={this.props.dashboardData} />
           </Col>
           <Col span={6}>
             <FeaturedCard />
@@ -80,7 +94,7 @@ class Home extends React.Component {
               <AllPosts />
             </Col>
             <Col span={6}>
-              <ListPosts />
+              <ListPosts dashboard={this.props.dashboardData} />
             </Col>
           </Row>
         </React.Fragment>

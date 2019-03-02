@@ -47,6 +47,7 @@ ReactDOM.render(
                   <Route path="/edit" component={EditPost} />
                   <Route path="/preview" component={Preview} />
                   <Route path="/profile" component={RouteApp} />
+                  <Route path="/:providerId/:title" component={Preview} />
                 </div>
               )}
             />

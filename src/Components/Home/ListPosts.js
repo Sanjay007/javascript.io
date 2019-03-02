@@ -14,19 +14,15 @@ var mapDispatchToProps = dispatch => {
 };
 
 class ListPosts extends React.Component {
-  constructor(props) {
-    super(props);
-  }
-
   render() {
+    const { dashboard } = this.props;
+    console.log(dashboard.length, "NNNNNNNNNNNNNNNNNNN");
+    const listItems = this.props.dashboard.map(itemData => (
+      <ListPostsItem itemData={itemData} />
+    ));
     return (
       <React.Fragment>
-        <Item.Group>
-          <ListPostsItem />
-          <ListPostsItem />
-          <ListPostsItem />
-          <ListPostsItem />
-        </Item.Group>
+        <Item.Group>{listItems}</Item.Group>
       </React.Fragment>
     );
   }

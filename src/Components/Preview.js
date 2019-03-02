@@ -69,7 +69,7 @@ class Preview extends Component {
 
     return (
       <Row type="flex">
-        <Col span={4} order={3}>
+        <Col span={6} order={3}>
           <Affix offsetTop={120} onChange={affixed => console.log(affixed)}>
             <div style={{ width: 30 }}>
               <div className="icons-list">
@@ -105,7 +105,7 @@ class Preview extends Component {
             </div>
           </Affix>
         </Col>
-        <Col span={16} order={2}>
+        <Col span={18} order={2}>
           <Card title={localStorage.getItem("title")}>
             <Row gutter={24}>
               <Col className="gutter-row" span={8}>

@@ -20,6 +20,8 @@ class ListPostsItem extends React.Component {
   }
 
   render() {
+    console.log(this.props.itemData, "Ind Item");
+    const { itemData } = this.props;
     return (
       <Item>
         <Item.Image
@@ -29,7 +31,10 @@ class ListPostsItem extends React.Component {
 
         <Item.Content>
           <Item.Header style={{ fontSize: "0.8em", fontFamily: "Roboto" }}>
-            Arrowhead Valley Camp Arrowhead Valley Camp
+            <Link to={`/${itemData.userbio.providerId}/${itemData.title}`}>
+              {" "}
+              {itemData.title}
+            </Link>
           </Item.Header>
           <Item.Meta>
             <span
@@ -40,7 +45,8 @@ class ListPostsItem extends React.Component {
               }}
               className="stay"
             >
-              <IC type="schedule" /> {"  "}Jan-7-2019
+              <IC type="schedule" /> {"  "}
+              {itemData.postDate}
             </span>
             <span
               style={{
@@ -80,12 +86,7 @@ class ListPostsItem extends React.Component {
 }
 
 ListPostsItem.propTypes = {
-  imageSrc: PropTypes.string.isRequired,
-  title: PropTypes.string.isRequired,
-  postDate: PropTypes.string.isRequired,
-  readTime: PropTypes.string,
-  likeCount: PropTypes.number,
-  viewCount: PropTypes.number
+  itemData: PropTypes.object.isRequired
 };
 
 export default connect(

@@ -30,11 +30,10 @@ class PublishModal extends React.Component {
   }
   handleChange = value => {
     console.log(value, "kdkdk");
-
+    var yz = [];
     if (value.length < 5) {
       //Storing Tags in Store
       for (let i = 0; i < value.length; i++) {
-        var yz = [];
         yz.push(value[i].key);
         this.props.storeTags(yz);
       }
@@ -62,17 +61,6 @@ class PublishModal extends React.Component {
         this.setState({ data: rdata, fetching: false });
       })
       .catch(err => {});
-
-    // fetch("http://localhost:9000/tags")
-    //   .then(response => response.json())
-    //   .then(body => {
-    //     console.log(body);
-    //     const data = body.results.data.map(user => ({
-    //       text: `${user.tag_name} ${user.tag_name}`,
-    //       value: user.tag_name
-    //     }));
-    //     this.setState({ data, fetching: false });
-    //   });
   };
 
   render() {

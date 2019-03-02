@@ -3,6 +3,7 @@ import userFunctions from "./user";
 import posts from "./posts";
 
 const reducers = combineReducers({
-  userFunctions
+  userFunctions,
+  posts
 });
 export default reducers;
